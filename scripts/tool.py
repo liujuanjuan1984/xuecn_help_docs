@@ -80,7 +80,7 @@ class JsonFile:
         self.write_file_by_json(__ipynb_data)
 
 
-def init_data(fromfile):
+def init_data(fromfile, jsonfile):
     """从数据库获取数据并初始化"""
     df = pd.read_csv(fromfile,sep=";",header=1)
     rlts = []
@@ -88,24 +88,42 @@ def init_data(fromfile):
     for i in df.values:
         rlts = [{"id":i[0],"created_at":i[1],"updated_at":i[2],"title":i[3],"content":i[4],"sort_id":i[5],"alias":i[6],"relative":i[7],"type":i[8]}] + rlts
 
-    JsonFile(dirpath+"\\data_dev\\help_docs.json").write_file_by_json(rlts)
+    JsonFile(jsonfile).write_file_by_json(rlts)
     
-    types = list(df["type"].unique())
+
+
+def json2ipynb(jsonfile,ipynbpath):
+
+    jfile = JsonFile(jsonfile)
+    filedata = jfile.read_file_by_json()
+
+    types = list(set([x["type"] for x in filedata]))
     for itype in types:
         lines = [f"# XUE.cn 帮助手册之{itype}\n","\n"]
-        for rlt in rlts:
-            if rlt["type"] == itype:
-                ilines = ["### " + rlt["title"] + "\n","\n"] \
-                        + [i+"\n" for i in rlt["content"].replace("\n","\n\n").split("\n")] \
+        for i in filedata:
+            if i["type"] == itype:
+                ilines = ["### " + i["title"] + "\n","\n"] \
+                        + [j+"\n" for j in i["content"].replace("\n","\n\n").split("\n")] \
                         + ["\n"]
                 lines.extend(ilines)
 
-        ifile = JsonFile(dirpath+"\\data_dev\\"+itype+".ipynb")
+        ifile = JsonFile(ipynbpath+"\\"+itype+".ipynb")
         ifile.init_ipynbfile(lines)
         ifile.split_markdown_cells()
 
-
 if __name__ == "__main__":
     dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
-    fromfile = dirpath + "\\data_dev\\grafana_data_export.csv"
-    init_data(fromfile)
+    fromfile = dirpath+"\\data_dev\\grafana_data_export.csv"
+    jsonfile = dirpath+"\\data_dev\\help_docs.json"
+    ipynbpath = dirpath+"\\data_dev"
+
+    # 首次初始化
+    # init_data(fromfile,jsonfile)
+
+    # 后续维护更新，规范写入
+    # jfile = JsonFile(jsonfile)
+    # filedata = jfile.read_file_by_json()
+    # jfile.write_file_by_json(filedata)
+
+    # 同步 json 数据生成 ipynb 文件
+    json2ipynb(jsonfile,ipynbpath)
