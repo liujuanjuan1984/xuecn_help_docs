@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import os
-
+import re
 
 class JsonFile:
     def __init__(self,filepath):
@@ -99,13 +99,24 @@ def json2ipynb(jsonfile,ipynbpath):
 
     types = list(set([x["type"] for x in filedata]))
     for itype in types:
-        lines = [f"# XUE.cn 帮助手册之{itype}\n","\n"]
+        lines = [f"## {itype}\n","\n"]
         for i in filedata:
             if i["type"] == itype:
-                ilines = ["### " + i["title"] + "\n","\n"] \
+                ilines = ["### " + i["title"] + "<a id='q"+str(i["id"])+"'></a>\n","\n"] \
                         + [j+"\n" for j in i["content"].replace("\n","\n\n").split("\n")] \
                         + ["\n"]
+                
+                if i["relative"] not in (0,"0") :
+                    for j in filedata:
+                        if str(j["id"]) == str(i["relative"]):
+                            x = j["title"]
+                            if j["type"] != i["type"]:
+                                ilines.extend(["**相关问题**：["+ x +"]("+j["type"]+".ipynb?anchor=q"+str(i["relative"])+")\n","\n"])
+                            elif j["type"] == i["type"]:
+                                ilines.extend(["**相关问题**：["+ x +"](#q"+str(i["relative"])+")\n","\n"])
+                            break
                 lines.extend(ilines)
+
 
         ifile = JsonFile(ipynbpath+"\\"+itype+".ipynb")
         ifile.init_ipynbfile(lines)
@@ -125,5 +136,5 @@ if __name__ == "__main__":
     # filedata = jfile.read_file_by_json()
     # jfile.write_file_by_json(filedata)
 
-    # 同步 json 数据生成 ipynb 文件
+    # 同步 json 数据生成 ipynb 文件。重复用的脚本。
     json2ipynb(jsonfile,ipynbpath)
