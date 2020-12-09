@@ -129,7 +129,9 @@ def json2ipynb(jsonfile,ipynbpath):
         ifile.init_ipynbfile(lines)
         ifile.split_markdown_cells()
 
-if __name__ == "__main__":
+
+def updated_ipyfiles():
+    """修改json文件后，想要发布 ipynb 文件，用该方法来生成"""
     dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
     fromfile = dirpath+"\\data_dev\\grafana_data_export.csv"
     jsonfile = dirpath+"\\data_dev\\help_docs.json"
@@ -145,3 +147,20 @@ if __name__ == "__main__":
 
     # 同步 json 数据生成 ipynb 文件。重复用的脚本。
     json2ipynb(jsonfile,ipynbpath)
+
+def jsonsorted():
+    """"对json数据按照id排序"""
+    dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
+    jsonfile = dirpath+"\\data_live\\help_docs.json"
+    data = JsonFile(jsonfile).read_file_by_json()
+    data = sorted(data,key=lambda x:x["id"])
+    JsonFile(jsonfile).write_file_by_json(data)
+
+
+
+def main():
+    jsonsorted()
+
+if __name__ == "__main__":
+    main()
+
