@@ -59,6 +59,8 @@ class JsonFile:
         for __cell in __oldcells:
             if __cell["cell_type"] == "code":
                 if len(__cell["source"]) > 0:
+                    if __icell["source"][-1][-1] == "\n":
+                        __icell["source"][-1] = __icell["source"][-1][:-1]
                     __newcells.append(__cell)
             else:
                 __lines = __cell["source"]
@@ -69,11 +71,16 @@ class JsonFile:
                         __end = __i
                         __icell = {"cell_type": "markdown","metadata": {},"source": __lines[__start:__end]}
                         if len(__icell["source"]) > 0:
+                            if __icell["source"][-1][-1] == "\n":
+                                __icell["source"][-1] = __icell["source"][-1][:-1]
                             __newcells.append(__icell)
                         __start = __i+1
 
+                
                 __icell = {"cell_type": "markdown","metadata": {},"source": __lines[__start:]}
                 if len(__icell["source"]) > 0:
+                    if __icell["source"][-1][-1] == "\n":
+                        __icell["source"][-1] = __icell["source"][-1][:-1]
                     __newcells.append(__icell)
         
         __ipynb_data["cells"] = __newcells
@@ -102,7 +109,7 @@ def json2ipynb(jsonfile,ipynbpath):
         lines = [f"## {itype}\n","\n"]
         for i in filedata:
             if i["type"] == itype:
-                ilines = ["### " + i["title"] + "<a id='q"+str(i["id"])+"'></a>\n","\n"] \
+                ilines = ["### " + i["title"] + "\n","<a id='q"+str(i["id"])+"'></a>\n","\n"] \
                         + [j+"\n" for j in i["content"].replace("\n","\n\n").split("\n")] \
                         + ["\n"]
                 
