@@ -147,12 +147,12 @@ def updated_ipyfiles():
     # 同步 json 数据生成 ipynb 文件。重复用的脚本。
     json2ipynb(jsonfile,ipynbpath)
 
-def jsonsorted():
+def jsonsorted(by='id'):
     """"对json数据按照id排序"""
     dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
     jsonfile = dirpath+"\\data_live\\help_docs.json"
     data = JsonFile(jsonfile).read_file_by_json()
-    data = sorted(data,key=lambda x:x["id"])
+    data = sorted(data,key=lambda x:x[by])
     JsonFile(jsonfile).write_file_by_json(data)
 
 def check_type():
@@ -169,9 +169,14 @@ def check_type():
     print(rlts)
 
 
+def change_ids():
+    pass
+
 def main():
-    #jsonsorted()
-    check_type()
+    dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
+    jsonfile = dirpath+"\\data_live\\help_docs.json"
+    data = JsonFile(jsonfile).read_file_by_json()
+    JsonFile(jsonfile).write_file_by_json(data)
 
 if __name__ == "__main__":
     main()
