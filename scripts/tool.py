@@ -98,7 +98,6 @@ def init_data(fromfile, jsonfile):
     JsonFile(jsonfile).write_file_by_json(rlts)
     
 
-
 def json2ipynb(jsonfile,ipynbpath):
 
     jfile = JsonFile(jsonfile)
@@ -156,10 +155,23 @@ def jsonsorted():
     data = sorted(data,key=lambda x:x["id"])
     JsonFile(jsonfile).write_file_by_json(data)
 
+def check_type():
+    """检查type有哪些类型"""
+    dirpath = r"D:\Jupyter\xuecn_books\xuecn_help_docs"
+    jsonfile = dirpath+"\\data_live\\help_docs.json"
+    data = JsonFile(jsonfile).read_file_by_json()
+    rlts = {}
+    for i in data:
+        if i["type"] not in rlts:
+            rlts[i['type']] = 1
+        else:
+            rlts[i['type']] += 1
+    print(rlts)
 
 
 def main():
-    jsonsorted()
+    #jsonsorted()
+    check_type()
 
 if __name__ == "__main__":
     main()
